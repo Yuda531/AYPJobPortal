@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -13,18 +14,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('employers', function (Blueprint $table) {
+        Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('company_name')->nullable();
-            $table->text('company_description')->nullable();
-            $table->string('title')->nullable();
-            $table->string('bio')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('location')->nullable();
-            $table->text('skills')->nullable();
+            $table->string('title');
+            $table->text('content')->nullable();
+            $table->binary('image')->nullable();
             $table->timestamps();
         });
+
+        DB::statement("ALTER TABLE posts MODIFY image MEDIUMBLOB");
     }
 
     /**
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('employers');
+        Schema::dropIfExists('posts');
     }
 };

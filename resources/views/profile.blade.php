@@ -27,8 +27,8 @@
                 <div class="position-absolute bottom-0 start-0 p-4 mb-5">
                     @if ($user->profile_picture)
                         <img src="data:image/jpeg;base64,{{ base64_encode($user->profile_picture) }}"
-                            class="rounded-circle border border-4 border-white mb-3" style="width: 150px; height: 150px; "
-                            alt="Profile Picture">
+                            class="rounded-circle border border-4 border-white mb-3"
+                            style="width: 150px; height: 150px; object-fit: fill;" alt="Profile Picture">
                     @else
                         <img src="{{ asset('storage/avatar_default.png') }}"
                             class="rounded-circle border border-4 border-white mb-3"
@@ -42,7 +42,14 @@
                 </div>
                 <div class="mt-5 mb-3 container">
                     <h2 class="mb-1 ms-4 mt-5" id="profileName">{{ $user->name }}</h2>
-                    <p class="mb-0 ms-4" id="profileTitle">{{ $jobSeeker->title ?? 'No title set' }}</p>
+                    <p class="mb-0 ms-4" id="profileTitle">
+                        @if ($user->role === 'job_seeker')
+                            {{ $profile->title ?? 'No title set' }}
+                        @else
+                            <strong> {{ $profile->title ?? 'No title set' }} </strong> at <strong>
+                                {{ $profile->company_name ?? 'No company name set' }} </strong>
+                        @endif
+                    </p>
                 </div>
             </div>
         </div>
@@ -55,9 +62,20 @@
                 <div class="card mb-4">
                     <div class="card-body ms-3">
                         <h4 class="card-title mb-3">Bio</h4>
-                        <p class="card-text" id="profileBio">{{ $jobSeeker->bio ?? 'No bio set' }}</p>
+                        <p class="card-text" id="profileBio">{{ $profile->bio ?? 'No bio set' }}</p>
                     </div>
                 </div>
+
+                @if ($user->role === 'employer')
+                    <!-- Company Description Section -->
+                    <div class="card mb-4">
+                        <div class="card-body ms-3">
+                            <h4 class="card-title mb-3">{{ $profile->company_name ?? 'No company name set' }}</h4>
+                            <p class="card-text" id="companyDescription">
+                                {{ $profile->company_description ?? 'No company description set' }}</p>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Experience Section -->
                 <div class="card mb-4">
@@ -89,8 +107,8 @@
                     <div class="card-body ms-3">
                         <h4 class="card-title mb-3">Skills</h4>
                         <div class="d-flex flex-wrap gap-2">
-                            @if ($jobSeeker && $jobSeeker->skills)
-                                @foreach (explode(',', $jobSeeker->skills) as $skill)
+                            @if ($profile && $profile->skills)
+                                @foreach (explode(',', $profile->skills) as $skill)
                                     <span class="badge bg-light text-dark p-2">{{ trim($skill) }}</span>
                                 @endforeach
                             @else
@@ -114,11 +132,11 @@
                             </li>
                             <li class="mb-2">
                                 <i class="fas fa-phone me-2 text-muted"></i>
-                                <span id="profilePhone">{{ $jobSeeker->phone ?? 'No phone number' }}</span>
+                                <span id="profilePhone">{{ $profile->phone ?? 'No phone number' }}</span>
                             </li>
                             <li class="mb-2">
                                 <i class="fas fa-map-marker-alt me-2 text-muted"></i>
-                                <span id="profileLocation">{{ $jobSeeker->location ?? 'No location set' }}</span>
+                                <span id="profileLocation">{{ $profile->location ?? 'No location set' }}</span>
                             </li>
                         </ul>
                     </div>
@@ -162,18 +180,36 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="last_name" class="form-label">Last Name</label>
                                     <input type="text" class="form-control" id="last_name" name="last_name"
-                                        value="{{ explode(' ', $user->name)[1] ?? '' }}">
+                                        value="{{ implode(' ', array_slice(explode(' ', $user->name), 1)) }}">
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="title" class="form-label">Title</label>
+                                <label for="title" class="form-label">
+                                    @if ($user->role === 'job_seeker')
+                                        Title
+                                    @else
+                                        Position
+                                    @endif
+                                </label>
                                 <input type="text" class="form-control" id="title" name="title"
-                                    value="{{ $jobSeeker->title ?? '' }}">
+                                    value="{{ $profile->title ?? '' }}">
                             </div>
                             <div class="mb-3">
                                 <label for="bio" class="form-label">Bio</label>
-                                <textarea class="form-control" id="bio" name="bio" rows="4">{{ $jobSeeker->bio ?? '' }}</textarea>
+                                <textarea class="form-control" id="bio" name="bio" rows="4">{{ $profile->bio ?? '' }}</textarea>
                             </div>
+
+                            @if ($user->role === 'employer')
+                                <div class="mb-3">
+                                    <label for="company_name" class="form-label">Company Name</label>
+                                    <input type="text" class="form-control" id="company_name" name="company_name"
+                                        value="{{ $profile->company_name ?? '' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="company_description" class="form-label">Company Description</label>
+                                    <textarea class="form-control" id="company_description" name="company_description" rows="4">{{ $profile->company_description ?? '' }}</textarea>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- Contact Information -->
@@ -182,12 +218,12 @@
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Phone</label>
                                 <input type="tel" class="form-control" id="phone" name="phone"
-                                    value="{{ $jobSeeker->phone ?? '' }}">
+                                    value="{{ $profile->phone ?? '' }}">
                             </div>
                             <div class="mb-3">
                                 <label for="location" class="form-label">Location</label>
                                 <input type="text" class="form-control" id="location" name="location"
-                                    value="{{ $jobSeeker->location ?? '' }}">
+                                    value="{{ $profile->location ?? '' }}">
                             </div>
                         </div>
 
@@ -196,7 +232,7 @@
                             <h6 class="mb-3">Skills</h6>
                             <div class="mb-3">
                                 <input type="text" class="form-control" id="skills" name="skills"
-                                    value="{{ $jobSeeker->skills ?? '' }}">
+                                    value="{{ $profile->skills ?? '' }}">
                                 <small class="text-muted">Separate skills with commas</small>
                             </div>
                         </div>

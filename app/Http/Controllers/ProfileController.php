@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\JobSeekers;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
+use App\Models\Employers;
 
 
 class ProfileController extends Controller
@@ -14,16 +14,20 @@ class ProfileController extends Controller
     public function show()
     {
         $user = Auth::user();
-        $jobSeeker = $user->jobSeeker;
+        $profile = null;
 
-        return view('profile', compact('user', 'jobSeeker'));
+        if ($user->role === 'job_seeker') {
+            $profile = $user->jobSeeker;
+        } elseif ($user->role === 'employer') {
+            $profile = $user->employer;
+        }
+
+        return view('profile', compact('user', 'profile'));
     }
 
     public function update(Request $request)
     {
         try {
-            // DB::beginTransaction();
-
             $user = Auth::user();
 
             $validated = $request->validate([
@@ -35,15 +39,13 @@ class ProfileController extends Controller
                 'bio' => 'nullable|string',
                 'skills' => 'nullable|string',
                 'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'company_name' => 'nullable|string|max:255',
+                'company_description' => 'nullable|string',
             ]);
 
             $user->name = $validated['first_name'] . ' ' . $validated['last_name'];
 
             if ($request->hasFile('profile_picture')) {
-                // $image = $request->file('profile_picture');
-                // $imageData = base64_encode(file_get_contents($image->getRealPath()));
-                // $user->profile_picture = $imageData;
-
                 $image = $request->file('profile_picture');
                 $binaryData = file_get_contents($image->getRealPath());
                 $user->profile_picture = $binaryData;
@@ -51,24 +53,30 @@ class ProfileController extends Controller
 
             $user->save();
 
-
             if ($user->role === 'job_seeker') {
-
-                $jobSeeker = $user->jobSeeker ?? new JobSeekers();
-                $jobSeeker->user_id = $user->id;
-                $jobSeeker->phone = $validated['phone'] ?? null;
-                $jobSeeker->location = $validated['location'] ?? null;
-                $jobSeeker->title = $validated['title'] ?? null;
-                $jobSeeker->bio = $validated['bio'] ?? null;
-                $jobSeeker->skills = $validated['skills'] ?? null;
-                $jobSeeker->save();
+                $profile = $user->jobSeeker ?? new JobSeekers();
+                $profile->user_id = $user->id;
+                $profile->phone = $validated['phone'] ?? null;
+                $profile->location = $validated['location'] ?? null;
+                $profile->title = $validated['title'] ?? null;
+                $profile->bio = $validated['bio'] ?? null;
+                $profile->skills = $validated['skills'] ?? null;
+                $profile->save();
+            } elseif ($user->role === 'employer') {
+                $profile = $user->employer ?? new Employers();
+                $profile->user_id = $user->id;
+                $profile->phone = $validated['phone'] ?? null;
+                $profile->location = $validated['location'] ?? null;
+                $profile->title = $validated['title'] ?? null;
+                $profile->bio = $validated['bio'] ?? null;
+                $profile->skills = $validated['skills'] ?? null;
+                $profile->company_name = $validated['company_name'] ?? null;
+                $profile->company_description = $validated['company_description'] ?? null;
+                $profile->save();
             }
-
-            // DB::commit();
 
             return redirect()->route('profile')->with('success', 'Profile updated successfully!');
         } catch (\Exception $e) {
-            // DB::rollBack();
             var_dump('Error occurred:', $e->getMessage());
             Log::error('Profile update error: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());

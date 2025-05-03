@@ -39,6 +39,11 @@ Route::middleware('auth')->group(function () {
         return view('dashboard', compact('user', 'jobSeeker'));
     })->name('dashboard');
 
+    Route::get('dashboard', [App\Http\Controllers\PostsController::class, 'index'])->name('dashboard');
+    Route::post('posts', [App\Http\Controllers\PostsController::class, 'store'])->name('posts.store');
+    Route::delete('posts/{post}', [App\Http\Controllers\PostsController::class, 'destroy'])->name('posts.destroy');
+    Route::put('posts/{post}', [App\Http\Controllers\PostsController::class, 'update'])->name('posts.update');
+
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 });

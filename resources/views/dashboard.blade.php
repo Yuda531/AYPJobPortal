@@ -2,6 +2,13 @@
 
 @section('content')
     <div class="container py-4">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <div class="row">
             <!-- Left Section - Profile Info -->
             <div class="col-md-3">
@@ -10,11 +17,11 @@
                         <div class="text-center mb-3">
                             @if ($user->profile_picture)
                                 <img src="data:image/jpeg;base64,{{ base64_encode($user->profile_picture) }}"
-                                    class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;"
+                                    class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: fill;"
                                     alt="Profile Picture">
                             @else
                                 <img src="{{ asset('storage/avatar_default.png') }}" class="rounded-circle mb-2"
-                                    style="width: 100px; height: 100px; object-fit: cover;" alt="Profile Picture">
+                                    style="width: 100px; height: 100px; object-fit: fill;" alt="Profile Picture">
                             @endif
                             <h5 class="mb-1">{{ $user->name }}</h5>
                             <p class="text-muted small mb-2">{{ $jobSeeker->title ?? 'No title set' }}</p>
@@ -64,24 +71,21 @@
                         <div class="d-flex mb-3">
                             @if ($user->profile_picture)
                                 <img src="data:image/jpeg;base64,{{ base64_encode($user->profile_picture) }}"
-                                    class="rounded-circle mb-2" style="width: 40px; height: 40px; object-fit: cover;"
+                                    class="rounded-circle mb-2" style="width: 40px; height: 40px; object-fit: fill;"
                                     alt="Profile Picture">
                             @else
                                 <img src="{{ asset('storage/avatar_default.png') }}" class="rounded-circle me-2"
-                                    style="width: 40px; height: 40px; object-fit: cover;" alt="Profile Picture">
+                                    style="width: 40px; height: 40px; object-fit: fill;" alt="Profile Picture">
                             @endif
                             <input type="text" class="form-control ms-2" placeholder="Start a post"
                                 data-bs-toggle="modal" data-bs-target="#createPostModal">
                         </div>
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between mx-5">
                             <button class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-image text-primary"></i> Photo
                             </button>
                             <button class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-video text-success"></i> Video
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="fas fa-calendar text-warning"></i> Event
                             </button>
                             <button class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-newspaper text-danger"></i> Article
@@ -90,151 +94,97 @@
                     </div>
                 </div>
 
+
                 <!-- Feed Posts -->
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex mb-3">
-                            <img src="https://picsum.photos/200/200?random=3" class="rounded-circle me-2"
-                                style="width: 40px; height: 40px; object-fit: cover;" alt="Profile Picture">
-                            <div>
-                                <h6 class="mb-0">Sarah Smith</h6>
-                                <small class="text-muted">Software Developer at Tech Corp</small>
+                @foreach ($posts as $post)
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex mb-3">
+                                @if ($post->user->profile_picture)
+                                    <img src="data:image/jpeg;base64,{{ base64_encode($post->user->profile_picture) }}"
+                                        class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: fill;"
+                                        alt="Profile Picture">
+                                @else
+                                    <img src="{{ asset('storage/avatar_default.png') }}" class="rounded-circle me-2"
+                                        style="width: 40px; height: 40px; object-fit: fill;" alt="Profile Picture">
+                                @endif
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">{{ $post->user->name }}</h6>
+                                    <small class="text-muted">{{ $post->created_at->diffForHumans() }}</small>
+                                </div>
+                                @if ($post->user_id === auth()->id())
+                                    <div class="dropdown">
+                                        <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                    data-bs-target="#editPostModal{{ $post->id }}">
+                                                    <i class="fas fa-edit me-2"></i>Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
+                                                    data-bs-target="#deletePostModal{{ $post->id }}">
+                                                    <i class="fas fa-trash-alt me-2"></i>Delete
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                @endif
+                            </div>
+                            <h5 class="card-title">{{ $post->title }}</h5>
+                            <p class="card-text">{{ $post->content }}</p>
+                            @if ($post->image)
+                                <img src="data:image/jpeg;base64,{{ base64_encode($post->image) }}"
+                                    class="img-fluid rounded mb-3" alt="Post Image">
+                            @endif
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="far fa-thumbs-up"></i> Like
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="far fa-comment"></i> Comment
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="far fa-share-square"></i> Share
+                                </button>
                             </div>
                         </div>
-                        <p class="card-text">Just completed an amazing project using Laravel and Vue.js! The team did an
-                            incredible job working together to deliver this solution.</p>
-                        <img src="https://picsum.photos/800/400?random=4" class="img-fluid rounded mb-3" alt="Post Image">
-                        <div class="d-flex justify-content-between">
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-thumbs-up"></i> Like
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-comment"></i> Comment
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-share-square"></i> Share
-                            </button>
-                        </div>
                     </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex mb-3">
-                            <img src="https://picsum.photos/200/200?random=5" class="rounded-circle me-2"
-                                style="width: 40px; height: 40px; object-fit: cover;" alt="Profile Picture">
-                            <div>
-                                <h6 class="mb-0">Mike Johnson</h6>
-                                <small class="text-muted">Senior Developer at Web Solutions</small>
-                            </div>
-                        </div>
-                        <p class="card-text">Looking for a talented frontend developer to join our team! If you're
-                            passionate about React and have experience with TypeScript, we'd love to hear from you.</p>
-                        <div class="d-flex justify-content-between">
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-thumbs-up"></i> Like
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-comment"></i> Comment
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-share-square"></i> Share
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex mb-3">
-                            <img src="https://picsum.photos/200/200?random=11" class="rounded-circle me-2"
-                                style="width: 40px; height: 40px; object-fit: cover;" alt="Profile Picture">
-                            <div>
-                                <h6 class="mb-0">Sophia Chen</h6>
-                                <small class="text-muted">Marketing Director at Digital Agency</small>
-                            </div>
-                        </div>
-                        <p class="card-text">Just wrapped up our biggest campaign of the year! Huge thanks to the entire
-                            team for their hard work. The results exceeded all our expectations!</p>
-                        <img src="https://picsum.photos/800/400?random=12" class="img-fluid rounded mb-3"
-                            alt="Post Image">
-                        <div class="d-flex justify-content-between">
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-thumbs-up"></i> Like
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-comment"></i> Comment
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-share-square"></i> Share
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex mb-3">
-                            <img src="https://picsum.photos/200/200?random=13" class="rounded-circle me-2"
-                                style="width: 40px; height: 40px; object-fit: cover;" alt="Profile Picture">
-                            <div>
-                                <h6 class="mb-0">Jajang</h6>
-                                <small class="text-muted">CTO at PodHub</small>
-                            </div>
-                        </div>
-                        <p class="card-text">We're hiring! Looking for a full-stack developer with experience in Node.js
-                            and React. Remote position with competitive salary and equity. DM me if interested!</p>
-                        <img src="https://picsum.photos/800/400?random=14" class="img-fluid rounded mb-3"
-                            alt="Post Image">
-                        <div class="d-flex justify-content-between">
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-thumbs-up"></i> Like
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-comment"></i> Comment
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="far fa-share-square"></i> Share
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
-
-
 
             <!-- Right Section - Suggestions -->
             <div class="col-md-3">
                 <div class="card mb-3">
                     <div class="card-body">
                         <h6 class="card-title">People you may know</h6>
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://picsum.photos/200/200?random=6" class="rounded-circle me-2"
-                                style="width: 40px; height: 40px; object-fit: cover;" alt="Profile Picture">
-                            <div class="flex-grow-1">
-                                <h6 class="mb-0">Syukur Sidiq</h6>
-                                <small class="text-muted">Frontend Developer</small>
+                        @foreach ($suggestedUsers as $suggestedUser)
+                            <div class="d-flex align-items-center mb-3">
+                                @if ($suggestedUser->profile_picture)
+                                    <img src="data:image/jpeg;base64,{{ base64_encode($suggestedUser->profile_picture) }}"
+                                        class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: fill;"
+                                        alt="Profile Picture">
+                                @else
+                                    <img src="{{ asset('storage/avatar_default.png') }}" class="rounded-circle me-2"
+                                        style="width: 40px; height: 40px; object-fit: fill;" alt="Profile Picture">
+                                @endif
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">{{ $suggestedUser->name }}</h6>
+                                    <small class="text-muted">
+                                        @if ($suggestedUser->role === 'job_seeker')
+                                            {{ $suggestedUser->jobSeeker->title ?? 'No title set' }}
+                                        @else
+                                            {{ $suggestedUser->employer->company_name ?? 'No company set' }}
+                                        @endif
+                                    </small>
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm">Connect</button>
                             </div>
-                            <button class="btn btn-outline-primary btn-sm">Connect</button>
-                        </div>
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://picsum.photos/200/200?random=7" class="rounded-circle me-2"
-                                style="width: 40px; height: 40px; object-fit: cover;" alt="Profile Picture">
-                            <div class="flex-grow-1">
-                                <h6 class="mb-0">Abdul Rahman</h6>
-                                <small class="text-muted">UI/UX Designer</small>
-                            </div>
-                            <button class="btn btn-outline-primary btn-sm">Connect</button>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <img src="https://picsum.photos/200/200?random=8" class="rounded-circle me-2"
-                                style="width: 40px; height: 40px; object-fit: cover;" alt="Profile Picture">
-                            <div class="flex-grow-1">
-                                <h6 class="mb-0">Asep Supriyadi</h6>
-                                <small class="text-muted">Backend Developer</small>
-                            </div>
-                            <button class="btn btn-outline-primary btn-sm">Connect</button>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
@@ -280,24 +230,27 @@
                     <div class="d-flex mb-3">
                         @if ($user->profile_picture)
                             <img src="data:image/jpeg;base64,{{ base64_encode($user->profile_picture) }}"
-                                class="rounded-circle mb-2" style="width: 40px; height: 40px; object-fit: cover;""
+                                class="rounded-circle mb-2" style="width: 40px; height: 40px; object-fit: fill;""
                                 alt="Profile Picture">
                         @else
                             <img src="{{ asset('storage/avatar_default.png') }}" class="rounded-circle me-2"
-                                style="width: 40px; height: 40px; object-fit: cover;" alt="Profile Picture">
+                                style="width: 40px; height: 40px; object-fit: fill;" alt="Profile Picture">
                         @endif
                         <div class="ms-2">
-                            <h6 class="mb-0">Agung Yuda</h6>
-                            <small class="text-muted">Software Engineer</small>
+                            <h6 class="mb-0">{{ $user->name }}</h6>
+                            <small class="text-muted">{{ $jobSeeker->title ?? 'No title set' }}</small>
                         </div>
                     </div>
-                    <form id="postForm">
+                    <form id="postForm" action="{{ route('posts.store') }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="postTitle"
+                            <input type="text" class="form-control" name="title"
                                 placeholder="Add a title to your post">
                         </div>
                         <div class="mb-3">
-                            <textarea class="form-control" id="postContent" rows="8" placeholder="What do you want to talk about?"></textarea>
+                            <textarea class="form-control" id="content" name="content" rows="8"
+                                placeholder="What do you want to talk about?"></textarea>
                         </div>
 
                         <!-- Image Preview Container -->
@@ -316,21 +269,10 @@
                         <div class="mb-3">
                             <div class="d-flex flex-wrap gap-2">
                                 <div class="media-option" data-type="image">
-                                    <input type="file" class="d-none" id="postImage" accept="image/*">
+                                    <input type="file" class="d-none" id="postImage" name="image"
+                                        accept="image/*">
                                     <label for="postImage" class="btn btn-outline-secondary btn-sm">
                                         <i class="fas fa-image text-primary"></i> Photo
-                                    </label>
-                                </div>
-                                <div class="media-option" data-type="video">
-                                    <input type="file" class="d-none" id="postVideo" accept="video/*">
-                                    <label for="postVideo" class="btn btn-outline-secondary btn-sm">
-                                        <i class="fas fa-video text-success"></i> Video
-                                    </label>
-                                </div>
-                                <div class="media-option" data-type="document">
-                                    <input type="file" class="d-none" id="postDocument" accept=".pdf,.doc,.docx">
-                                    <label for="postDocument" class="btn btn-outline-secondary btn-sm">
-                                        <i class="fas fa-file-alt text-info"></i> Document
                                     </label>
                                 </div>
                             </div>
@@ -345,6 +287,85 @@
             </div>
         </div>
     </div>
+
+    <!-- Edit Post Modal -->
+    @foreach ($posts as $post)
+        @if ($post->user_id === auth()->id())
+            <div class="modal fade" id="editPostModal{{ $post->id }}" tabindex="-1"
+                aria-labelledby="editPostModalLabel{{ $post->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editPostModalLabel{{ $post->id }}">Edit Post</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <form action="{{ route('posts.update', $post->id) }}" method="POST"
+                            enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="title" name="title"
+                                        value="{{ $post->title }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="content" class="form-label">Content</label>
+                                    <textarea class="form-control" id="content" name="content" rows="3" required>{{ $post->content }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="image" class="form-label">Image (Optional)</label>
+                                    <input type="file" class="form-control" id="image" name="image"
+                                        accept="image/*">
+                                    @if ($post->image)
+                                        <div class="mt-2">
+                                            <img src="data:image/jpeg;base64,{{ base64_encode($post->image) }}"
+                                                class="img-thumbnail" style="max-width: 200px;" alt="Current Image">
+                                            <p class="text-muted mt-1">Current image</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update Post</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
+
+    <!-- Delete Post Modal -->
+    @foreach ($posts as $post)
+        @if ($post->user_id === auth()->id())
+            <div class="modal fade" id="deletePostModal{{ $post->id }}" tabindex="-1"
+                aria-labelledby="deletePostModalLabel{{ $post->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deletePostModalLabel{{ $post->id }}">Delete Post</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete this post? This action cannot be undone.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form action="{{ route('posts.destroy', $post->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
 
     <style>
         .card {
