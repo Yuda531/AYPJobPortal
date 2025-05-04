@@ -43,6 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::post('posts', [App\Http\Controllers\PostsController::class, 'store'])->name('posts.store');
     Route::delete('posts/{post}', [App\Http\Controllers\PostsController::class, 'destroy'])->name('posts.destroy');
     Route::put('posts/{post}', [App\Http\Controllers\PostsController::class, 'update'])->name('posts.update');
+    Route::get('posts/{post}', [App\Http\Controllers\PostsController::class, 'show'])->name('posts.show');
+
+    Route::post('posts/{post}/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
+    Route::delete('comments/{comment}', [App\Http\Controllers\CommentController::class, 'destroy'])->name('comments.destroy');
 
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');

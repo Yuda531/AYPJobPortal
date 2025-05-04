@@ -53,4 +53,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employers::class, 'user_id');
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Posts::class, 'user_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'user_id');
+    }
 }

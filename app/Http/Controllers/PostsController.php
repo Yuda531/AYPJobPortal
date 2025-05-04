@@ -14,15 +14,19 @@ class PostsController extends Controller
     {
         $user = auth()->user();
         $jobSeeker = $user->jobSeeker;
-        $posts = Posts::with('user')->latest()->get();
+        $employer = $user->employer;
+        $posts = Posts::with(['user' => function ($query) {
+            $query->with(['jobSeeker', 'employer']);
+        }])->latest()->get();
 
         // Get 3 random users excluding the current user
         $suggestedUsers = User::where('id', '!=', $user->id)
+            ->with(['jobSeeker', 'employer'])
             ->inRandomOrder()
             ->limit(3)
             ->get();
 
-        return view('dashboard', compact('posts', 'user', 'jobSeeker', 'suggestedUsers'));
+        return view('dashboard', compact('posts', 'user', 'jobSeeker', 'employer', 'suggestedUsers'));
     }
 
 
@@ -59,10 +63,15 @@ class PostsController extends Controller
     }
 
 
-    // public function show($id)
-    // {
-    //     //
-    // }
+    public function show($id)
+    {
+        $post = Posts::with(['user', 'comments' => function ($query) {
+            $query->with(['user' => function ($query) {
+                $query->with(['jobSeeker', 'employer']);
+            }]);
+        }])->findOrFail($id);
+        return view('posts.show', compact('post'));
+    }
 
 
     // public function edit($id)

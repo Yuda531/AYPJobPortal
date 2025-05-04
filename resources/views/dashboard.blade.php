@@ -24,7 +24,14 @@
                                     style="width: 100px; height: 100px; object-fit: fill;" alt="Profile Picture">
                             @endif
                             <h5 class="mb-1">{{ $user->name }}</h5>
-                            <p class="text-muted small mb-2">{{ $jobSeeker->title ?? 'No title set' }}</p>
+                            <p class="text-muted small mb-2">
+                                @if ($user->role === 'job_seeker')
+                                    {{ $jobSeeker->title ?? 'No title set' }}
+                                @else
+                                    <strong>{{ $employer->title ?? 'No title set' }}</strong> at
+                                    <strong>{{ $employer->company_name ?? 'No company name set' }}</strong>
+                                @endif
+                            </p>
                             <div class="border-top pt-2">
                                 <div class="d-flex justify-content-between small text-muted mb-1">
                                     <span>Profile Views</span>
@@ -145,9 +152,9 @@
                                 <button class="btn btn-outline-secondary btn-sm">
                                     <i class="far fa-thumbs-up"></i> Like
                                 </button>
-                                <button class="btn btn-outline-secondary btn-sm">
+                                <a href="{{ route('posts.show', $post->id) }}" class="btn btn-outline-secondary btn-sm">
                                     <i class="far fa-comment"></i> Comment
-                                </button>
+                                </a>
                                 <button class="btn btn-outline-secondary btn-sm">
                                     <i class="far fa-share-square"></i> Share
                                 </button>
