@@ -245,7 +245,14 @@
                         @endif
                         <div class="ms-2">
                             <h6 class="mb-0">{{ $user->name }}</h6>
-                            <small class="text-muted">{{ $jobSeeker->title ?? 'No title set' }}</small>
+                            <small class="text-muted">
+                                @if ($user->role === 'job_seeker')
+                                    {{ $jobSeeker->title ?? 'No title set' }}
+                                @else
+                                    <strong>{{ $employer->title ?? 'No title set' }}</strong> at
+                                    <strong>{{ $employer->company_name ?? 'No company name set' }}</strong>
+                                @endif
+                            </small>
                         </div>
                     </div>
                     <form id="postForm" action="{{ route('posts.store') }}" method="POST"

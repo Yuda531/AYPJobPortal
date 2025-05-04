@@ -49,5 +49,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('comments/{comment}', [App\Http\Controllers\CommentController::class, 'destroy'])->name('comments.destroy');
 
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
+    Route::get('/profile/{user}', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('/jobs', [App\Http\Controllers\JobController::class, 'index'])->name('jobs.index');
+    Route::get('/jobs/create', [App\Http\Controllers\JobController::class, 'create'])->name('jobs.create');
+    Route::get('/jobs/{job}', [App\Http\Controllers\JobController::class, 'show'])->name('jobs.show');
+
+    Route::get('/network', [App\Http\Controllers\NetworkController::class, 'index'])->name('network.index');
 });

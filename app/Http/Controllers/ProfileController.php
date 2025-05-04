@@ -7,22 +7,28 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\JobSeekers;
 use Illuminate\Support\Facades\Log;
 use App\Models\Employers;
-
+use App\Models\User;
 
 class ProfileController extends Controller
 {
-    public function show()
+    public function show(User $user = null)
     {
-        $user = Auth::user();
-        $profile = null;
+        // If no user is provided, show the authenticated user's profile
+        if (!$user) {
+            $user = Auth::user();
+        }
 
+        $profile = null;
         if ($user->role === 'job_seeker') {
             $profile = $user->jobSeeker;
         } elseif ($user->role === 'employer') {
             $profile = $user->employer;
         }
 
-        return view('profile', compact('user', 'profile'));
+        // Check if the profile being viewed is the authenticated user's profile
+        $isOwnProfile = Auth::check() && Auth::id() === $user->id;
+
+        return view('profile.show', compact('user', 'profile', 'isOwnProfile'));
     }
 
     public function update(Request $request)
@@ -75,12 +81,11 @@ class ProfileController extends Controller
                 $profile->save();
             }
 
-            return redirect()->route('profile')->with('success', 'Profile updated successfully!');
+            return redirect()->route('profile.show')->with('success', 'Profile updated successfully!');
         } catch (\Exception $e) {
-            var_dump('Error occurred:', $e->getMessage());
             Log::error('Profile update error: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            return redirect()->back()->with('error', $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while updating your profile.');
         }
     }
 }

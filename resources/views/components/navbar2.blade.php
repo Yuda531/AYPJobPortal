@@ -27,14 +27,14 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link d-flex flex-column align-items-center" href="#jobs">
+                    <a class="nav-link d-flex flex-column align-items-center" href="{{ route('jobs.index') }}">
                         <i class="fas fa-briefcase fs-5"></i>
                         <small>Jobs</small>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link d-flex flex-column align-items-center" href="#network">
+                    <a class="nav-link d-flex flex-column align-items-center" href="{{ route('network.index') }}">
                         <i class="fas fa-users fs-5"></i>
                         <small>Network</small>
                     </a>
