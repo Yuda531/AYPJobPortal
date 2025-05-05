@@ -34,22 +34,14 @@
                             style="width: 150px; height: 150px; object-fit: cover;" alt="Profile Picture">
                     @endif
                 </div>
-                @if ($isOwnProfile)
-                    <div class="position-absolute bottom-0 end-0 p-4">
-                        <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                            <i class="fas fa-pencil-alt me-2"></i>Edit Profile
-                        </button>
-                    </div>
-                @else
-                    <div class="position-absolute bottom-0 end-0 p-4">
-                        <button class="btn btn-primary me-2">
-                            <i class="fas fa-user-plus me-2"></i>Connect
-                        </button>
-                        <button class="btn btn-outline-primary">
-                            <i class="fas fa-envelope me-2"></i>Message
-                        </button>
-                    </div>
-                @endif
+                <div class="position-absolute bottom-0 end-0 p-4">
+                    <button class="btn btn-primary me-2">
+                        <i class="fas fa-user-plus me-2"></i>Connect
+                    </button>
+                    <button class="btn btn-outline-primary">
+                        <i class="fas fa-envelope me-2"></i>Message
+                    </button>
+                </div>
                 <div class="mt-5 mb-3 container">
                     <h2 class="mb-1 ms-4 mt-5" id="profileName">{{ $user->name }}</h2>
                     <p class="mb-0 ms-4" id="profileTitle">
@@ -165,115 +157,6 @@
             </div>
         </div>
     </div>
-
-    @if ($isOwnProfile)
-        <!-- Edit Profile Modal -->
-        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="profileForm" action="{{ route('profile.update') }}" method="POST"
-                            enctype="multipart/form-data">
-                            @csrf
-                            <!-- Basic Information -->
-                            <div class="mb-4">
-                                <h6 class="mb-3">Basic Information</h6>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="first_name" class="form-label">First Name</label>
-                                        <input type="text" class="form-control" id="first_name" name="first_name"
-                                            value="{{ explode(' ', $user->name)[0] }}">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="last_name" class="form-label">Last Name</label>
-                                        <input type="text" class="form-control" id="last_name" name="last_name"
-                                            value="{{ implode(' ', array_slice(explode(' ', $user->name), 1)) }}">
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="title" class="form-label">
-                                        @if ($user->role === 'job_seeker')
-                                            Title
-                                        @else
-                                            Position
-                                        @endif
-                                    </label>
-                                    <input type="text" class="form-control" id="title" name="title"
-                                        value="{{ $profile->title ?? '' }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="bio" class="form-label">Bio</label>
-                                    <textarea class="form-control" id="bio" name="bio" rows="4">{{ $profile->bio ?? '' }}</textarea>
-                                </div>
-
-                                @if ($user->role === 'employer')
-                                    <div class="mb-3">
-                                        <label for="company_name" class="form-label">Company Name</label>
-                                        <input type="text" class="form-control" id="company_name" name="company_name"
-                                            value="{{ $profile->company_name ?? '' }}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="company_description" class="form-label">Company Description</label>
-                                        <textarea class="form-control" id="company_description" name="company_description" rows="4">{{ $profile->company_description ?? '' }}</textarea>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <!-- Contact Information -->
-                            <div class="mb-4">
-                                <h6 class="mb-3">Contact Information</h6>
-                                <div class="mb-3">
-                                    <label for="phone" class="form-label">Phone</label>
-                                    <input type="tel" class="form-control" id="phone" name="phone"
-                                        value="{{ $profile->phone ?? '' }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="location" class="form-label">Location</label>
-                                    <input type="text" class="form-control" id="location" name="location"
-                                        value="{{ $profile->location ?? '' }}">
-                                </div>
-                            </div>
-
-                            <!-- Skills -->
-                            <div class="mb-4">
-                                <h6 class="mb-3">Skills</h6>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control" id="skills" name="skills"
-                                        value="{{ $profile->skills ?? '' }}">
-                                    <small class="text-muted">Separate skills with commas</small>
-                                </div>
-                            </div>
-
-                            <!-- Profile Picture -->
-                            <div class="mb-4">
-                                <h6 class="mb-3">Profile Picture</h6>
-                                <div class="mb-3">
-                                    <input type="file" class="form-control" id="profile_picture"
-                                        name="profile_picture" accept="image/*" onchange="validateImageSize(this)">
-                                    <div class="form-text text-muted">
-                                        <ul class="mb-0">
-                                            <li>Maximum file size: 2MB</li>
-                                            <li>Supported formats: JPG, JPEG, PNG</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" form="profileForm" class="btn btn-primary" id="button-submit">Save
-                            changes</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
 
     <style>
         .card {

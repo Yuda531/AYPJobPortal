@@ -51,7 +51,7 @@
                             {{-- <a class="dropdown-item" href="{{ route('profile') }}">
                                 <i class="fas fa-user me-2"></i>View Profile
                             </a> --}}
-                            <a class="dropdown-item" href="{{ route('profile') }}">
+                            <a class="dropdown-item" href="{{ route('profile.index') }}">
                                 <i class="fas fa-user me-2"></i>View Profile
                             </a>
                         </li>

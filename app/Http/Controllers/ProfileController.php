@@ -11,13 +11,22 @@ use App\Models\User;
 
 class ProfileController extends Controller
 {
-    public function show(User $user = null)
+    public function index()
     {
-        // If no user is provided, show the authenticated user's profile
-        if (!$user) {
-            $user = Auth::user();
+        $user = Auth::user();
+        $profile = null;
+
+        if ($user->role === 'job_seeker') {
+            $profile = $user->jobSeeker;
+        } elseif ($user->role === 'employer') {
+            $profile = $user->employer;
         }
 
+        return view('profile', compact('user', 'profile'));
+    }
+
+    public function show(User $user)
+    {
         $profile = null;
         if ($user->role === 'job_seeker') {
             $profile = $user->jobSeeker;
@@ -81,7 +90,7 @@ class ProfileController extends Controller
                 $profile->save();
             }
 
-            return redirect()->route('profile.show')->with('success', 'Profile updated successfully!');
+            return redirect()->route('profile.index')->with('success', 'Profile updated successfully!');
         } catch (\Exception $e) {
             Log::error('Profile update error: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
