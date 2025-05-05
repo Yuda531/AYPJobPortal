@@ -44,7 +44,7 @@
                             </div>
                         </div>
                         <div class="d-grid">
-                            <a href="{{ route('profile') }}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                            <a href="{{ route('profile.index') }}" class="btn btn-outline-primary btn-sm">View Profile</a>
                         </div>
                     </div>
                 </div>
