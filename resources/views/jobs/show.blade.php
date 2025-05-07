@@ -71,7 +71,7 @@
                                 <form action="{{ route('jobs.destroy', $job->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger"
+                                    <button type="submit" class="btn btn-danger w-100"
                                         onclick="return confirm('Are you sure you want to delete this job?')">
                                         <i class="fas fa-trash"></i> Delete Job
                                     </button>
