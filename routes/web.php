@@ -54,7 +54,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/jobs', [App\Http\Controllers\JobController::class, 'index'])->name('jobs.index');
     Route::get('/jobs/create', [App\Http\Controllers\JobController::class, 'create'])->name('jobs.create');
+    Route::post('/jobs', [App\Http\Controllers\JobController::class, 'store'])->name('jobs.store');
     Route::get('/jobs/{job}', [App\Http\Controllers\JobController::class, 'show'])->name('jobs.show');
+    Route::get('/jobs/{job}/edit', [App\Http\Controllers\JobController::class, 'edit'])->name('jobs.edit');
+    Route::put('/jobs/{job}', [App\Http\Controllers\JobController::class, 'update'])->name('jobs.update');
+    Route::delete('/jobs/{job}', [App\Http\Controllers\JobController::class, 'destroy'])->name('jobs.destroy');
 
     Route::get('/network', [App\Http\Controllers\NetworkController::class, 'index'])->name('network.index');
 });

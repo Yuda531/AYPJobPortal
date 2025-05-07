@@ -1,3 +1,7 @@
+@php
+    use App\Models\Job;
+@endphp
+
 @extends('layouts.app2')
 
 @section('content')
@@ -9,49 +13,31 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-4">
                             <div>
-                                <h2 class="card-title">Senior PHP Developer</h2>
-                                <h5 class="text-muted">Tech Company Inc.</h5>
+                                <h2 class="card-title">{{ $job->title }}</h2>
+                                <h5 class="text-muted">{{ $job->employer->company_name }}</h5>
                             </div>
                             <div class="text-end">
-                                <span class="badge bg-primary">Full Time</span>
-                                <span class="badge bg-secondary">Senior</span>
+                                <span class="badge bg-primary">{{ ucfirst($job->job_type) }}</span>
+                                <span class="badge bg-secondary">{{ ucfirst($job->experience_level) }}</span>
                             </div>
                         </div>
 
                         <div class="mb-4">
                             <h5>Job Description</h5>
-                            <p>We are looking for an experienced PHP developer to join our team. The ideal candidate will
-                                have strong experience with Laravel and modern PHP development practices.</p>
-                            <p>Responsibilities:</p>
-                            <ul>
-                                <li>Develop and maintain web applications using PHP and Laravel</li>
-                                <li>Write clean, maintainable, and well-documented code</li>
-                                <li>Collaborate with frontend developers to integrate user-facing elements</li>
-                                <li>Implement security and data protection measures</li>
-                                <li>Optimize application for maximum speed and scalability</li>
-                            </ul>
+                            {!! $job->description !!}
                         </div>
 
                         <div class="mb-4">
                             <h5>Requirements</h5>
-                            <ul>
-                                <li>5+ years of experience in PHP development</li>
-                                <li>Strong knowledge of Laravel framework</li>
-                                <li>Experience with MySQL and database design</li>
-                                <li>Understanding of MVC design patterns</li>
-                                <li>Familiarity with Git version control</li>
-                                <li>Good problem-solving skills</li>
-                            </ul>
+                            {!! $job->requirements !!}
                         </div>
 
                         <div class="mb-4">
                             <h5>Skills</h5>
                             <div>
-                                <span class="badge bg-light text-dark">PHP</span>
-                                <span class="badge bg-light text-dark">Laravel</span>
-                                <span class="badge bg-light text-dark">MySQL</span>
-                                <span class="badge bg-light text-dark">Git</span>
-                                <span class="badge bg-light text-dark">REST API</span>
+                                @foreach (explode(',', $job->skills) as $skill)
+                                    <span class="badge bg-light text-dark">{{ trim($skill) }}</span>
+                                @endforeach
                             </div>
                         </div>
 
@@ -59,20 +45,39 @@
                             <h5>Job Details</h5>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> New York, USA</p>
-                                    <p><i class="fas fa-money-bill-wave"></i> <strong>Salary:</strong> $80,000 - $100,000
+                                    <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ $job->location }}
+                                    </p>
+                                    <p><i class="fas fa-money-bill-wave"></i> <strong>Salary:</strong> {{ $job->salary }}
                                     </p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><i class="fas fa-clock"></i> <strong>Posted:</strong> 2 days ago</p>
-                                    <p><i class="fas fa-calendar-times"></i> <strong>Deadline:</strong> March 31, 2024</p>
+                                    <p><i class="fas fa-clock"></i> <strong>Posted:</strong>
+                                        {{ $job->created_at->diffForHumans() }}</p>
+                                    <p><i class="fas fa-calendar-times"></i> <strong>Deadline:</strong>
+                                        {{ $job->deadline->format('F d, Y') }}</p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button class="btn btn-primary">Apply Now</button>
-                            <a href="#" class="btn btn-outline-secondary">Back to Jobs</a>
+                            @if (Auth::user()->role !== 'employer')
+                                <button class="btn btn-primary">Apply Now</button>
+                            @endif
+
+                            @if (Auth::user()->role === 'employer' && Auth::user()->employer->id === $job->employer_id)
+                                <a href="{{ route('jobs.edit', $job->id) }}" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Edit Job
+                                </a>
+                                <form action="{{ route('jobs.destroy', $job->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger"
+                                        onclick="return confirm('Are you sure you want to delete this job?')">
+                                        <i class="fas fa-trash"></i> Delete Job
+                                    </button>
+                                </form>
+                            @endif
+                            <a href="{{ route('jobs.index') }}" class="btn btn-outline-secondary">Back to Jobs</a>
                         </div>
                     </div>
                 </div>
@@ -83,12 +88,11 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title">About Company</h5>
-                        <p class="card-text">Tech Company Inc. is a leading technology company specializing in web
-                            development and digital solutions. We have been in business for over 10 years and have a team of
-                            50+ employees.</p>
-                        <p><i class="fas fa-globe"></i> <a href="#">www.techcompany.com</a></p>
+                        <p class="card-text">{{ $job->employer->company_description }}</p>
+                        <p><i class="fas fa-globe"></i> <a href="{{ $job->employer->website }}"
+                                target="_blank">{{ $job->employer->website }}</a></p>
                         <p><i class="fas fa-envelope"></i> <a
-                                href="mailto:careers@techcompany.com">careers@techcompany.com</a></p>
+                                href="mailto:{{ $job->employer->email }}">{{ $job->employer->email }}</a></p>
                     </div>
                 </div>
 
@@ -96,22 +100,17 @@
                     <div class="card-body">
                         <h5 class="card-title">Similar Jobs</h5>
                         <div class="list-group">
-                            <a href="#" class="list-group-item list-group-item-action">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">PHP Developer</h6>
-                                    <small class="text-muted">2 days ago</small>
-                                </div>
-                                <p class="mb-1">Web Solutions Ltd.</p>
-                                <small class="text-muted">London, UK</small>
-                            </a>
-                            <a href="#" class="list-group-item list-group-item-action">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">Backend Developer</h6>
-                                    <small class="text-muted">3 days ago</small>
-                                </div>
-                                <p class="mb-1">Digital Tech</p>
-                                <small class="text-muted">San Francisco, USA</small>
-                            </a>
+                            @foreach ($similarJobs as $similarJob)
+                                <a href="{{ route('jobs.show', $similarJob->id) }}"
+                                    class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ $similarJob->title }}</h6>
+                                        <small class="text-muted">{{ $similarJob->created_at->diffForHumans() }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ $similarJob->employer->company_name }}</p>
+                                    <small class="text-muted">{{ $similarJob->location }}</small>
+                                </a>
+                            @endforeach
                         </div>
                     </div>
                 </div>

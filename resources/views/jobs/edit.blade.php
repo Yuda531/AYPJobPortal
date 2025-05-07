@@ -20,16 +20,17 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="mb-0">Post a New Job</h4>
+                        <h4 class="mb-0">Edit Job</h4>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('jobs.store') }}" method="POST">
+                        <form action="{{ route('jobs.update', $job->id) }}" method="POST">
                             @csrf
+                            @method('PUT')
                             <div class="mb-3">
                                 <label for="title" class="form-label">Job Title</label>
                                 <input type="text" class="form-control @error('title') is-invalid @enderror"
                                     id="title" name="title" placeholder="e.g. Senior PHP Developer"
-                                    value="{{ old('title') }}">
+                                    value="{{ old('title', $job->title) }}">
                                 @error('title')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -38,7 +39,7 @@
                             <div class="mb-3">
                                 <label for="description" class="form-label">Job Description</label>
                                 <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description"
-                                    rows="5" placeholder="Describe the job responsibilities and requirements...">{{ old('description') }}</textarea>
+                                    rows="5" placeholder="Describe the job responsibilities and requirements...">{{ old('description', strip_tags($job->description)) }}</textarea>
                                 @error('description')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -47,7 +48,7 @@
                             <div class="mb-3">
                                 <label for="requirements" class="form-label">Requirements</label>
                                 <textarea class="form-control @error('requirements') is-invalid @enderror" id="requirements" name="requirements"
-                                    rows="5" placeholder="List the required skills and qualifications... (Press Enter for new line)">{{ old('requirements') }}</textarea>
+                                    rows="5" placeholder="List the required skills and qualifications... (Press Enter for new line)">{{ old('requirements', strip_tags($job->requirements)) }}</textarea>
                                 <div class="form-text">Press Enter for each new requirement</div>
                                 @error('requirements')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -59,7 +60,7 @@
                                     <label for="location" class="form-label">Location</label>
                                     <input type="text" class="form-control @error('location') is-invalid @enderror"
                                         id="location" name="location" placeholder="e.g. Jakarta, Indonesia"
-                                        value="{{ old('location') }}">
+                                        value="{{ old('location', $job->location) }}">
                                     @error('location')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -68,7 +69,7 @@
                                     <label for="salary" class="form-label">Salary</label>
                                     <input type="text" class="form-control @error('salary') is-invalid @enderror"
                                         id="salary" name="salary" placeholder="e.g. $800 - $1000"
-                                        value="{{ old('salary') }}">
+                                        value="{{ old('salary', $job->salary) }}">
                                     @error('salary')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -80,11 +81,14 @@
                                     <label for="job_type" class="form-label">Job Type</label>
                                     <select class="form-select @error('job_type') is-invalid @enderror" id="job_type"
                                         name="job_type">
-                                        <option value="full-time" {{ old('job_type') == 'full-time' ? 'selected' : '' }}>
-                                            Full Time</option>
-                                        <option value="part-time" {{ old('job_type') == 'part-time' ? 'selected' : '' }}>
-                                            Part Time</option>
-                                        <option value="internship" {{ old('job_type') == 'internship' ? 'selected' : '' }}>
+                                        <option value="full-time"
+                                            {{ old('job_type', $job->job_type) == 'full-time' ? 'selected' : '' }}>Full
+                                            Time</option>
+                                        <option value="part-time"
+                                            {{ old('job_type', $job->job_type) == 'part-time' ? 'selected' : '' }}>Part
+                                            Time</option>
+                                        <option value="internship"
+                                            {{ old('job_type', $job->job_type) == 'internship' ? 'selected' : '' }}>
                                             Internship</option>
                                     </select>
                                     @error('job_type')
@@ -96,15 +100,19 @@
                                     <select class="form-select @error('experience_level') is-invalid @enderror"
                                         id="experience_level" name="experience_level">
                                         <option value="no_experience"
-                                            {{ old('experience_level') == 'no_experience' ? 'selected' : '' }}>No
-                                            Experience</option>
-                                        <option value="entry" {{ old('experience_level') == 'entry' ? 'selected' : '' }}>
+                                            {{ old('experience_level', $job->experience_level) == 'no_experience' ? 'selected' : '' }}>
+                                            No Experience</option>
+                                        <option value="entry"
+                                            {{ old('experience_level', $job->experience_level) == 'entry' ? 'selected' : '' }}>
                                             Entry Level</option>
-                                        <option value="mid" {{ old('experience_level') == 'mid' ? 'selected' : '' }}>Mid
-                                            Level</option>
-                                        <option value="senior" {{ old('experience_level') == 'senior' ? 'selected' : '' }}>
+                                        <option value="mid"
+                                            {{ old('experience_level', $job->experience_level) == 'mid' ? 'selected' : '' }}>
+                                            Mid Level</option>
+                                        <option value="senior"
+                                            {{ old('experience_level', $job->experience_level) == 'senior' ? 'selected' : '' }}>
                                             Senior Level</option>
-                                        <option value="expert" {{ old('experience_level') == 'expert' ? 'selected' : '' }}>
+                                        <option value="expert"
+                                            {{ old('experience_level', $job->experience_level) == 'expert' ? 'selected' : '' }}>
                                             Expert Level</option>
                                     </select>
                                     @error('experience_level')
@@ -116,7 +124,8 @@
                             <div class="mb-3">
                                 <label for="deadline" class="form-label">Application Deadline</label>
                                 <input type="date" class="form-control @error('deadline') is-invalid @enderror"
-                                    id="deadline" name="deadline" value="{{ old('deadline') }}">
+                                    id="deadline" name="deadline"
+                                    value="{{ old('deadline', $job->deadline->format('Y-m-d')) }}">
                                 @error('deadline')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -126,7 +135,7 @@
                                 <label for="skills" class="form-label">Required Skills</label>
                                 <input type="text" class="form-control @error('skills') is-invalid @enderror"
                                     id="skills" name="skills" placeholder="e.g. PHP, Laravel, MySQL, JavaScript"
-                                    value="{{ old('skills') }}">
+                                    value="{{ old('skills', $job->skills) }}">
                                 <div class="form-text">Separate skills with commas</div>
                                 @error('skills')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -134,8 +143,8 @@
                             </div>
 
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Post Job</button>
-                                <a href="{{ route('jobs.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Update Job</button>
+                                <a href="{{ route('jobs.show', $job->id) }}" class="btn btn-outline-secondary">Cancel</a>
                             </div>
                         </form>
                     </div>
