@@ -88,11 +88,17 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title">About Company</h5>
+                        <p class="card-text"><strong>{{ $job->employer->company_name }}</strong></p>
                         <p class="card-text">{{ $job->employer->company_description }}</p>
-                        <p><i class="fas fa-globe"></i> <a href="{{ $job->employer->website }}"
-                                target="_blank">{{ $job->employer->website }}</a></p>
-                        <p><i class="fas fa-envelope"></i> <a
-                                href="mailto:{{ $job->employer->email }}">{{ $job->employer->email }}</a></p>
+                        <p class="employers-email">
+                            <i class="fas fa-envelope"></i>
+                            @if ($job->employer && $job->employer->user)
+                                <a href="mailto:{{ $job->employer->user->email }}"
+                                    class="text-decoration-none text-dark">{{ $job->employer->user->email }}</a>
+                            @else
+                                <span>Email not available</span>
+                            @endif
+                        </p>
                     </div>
                 </div>
 
