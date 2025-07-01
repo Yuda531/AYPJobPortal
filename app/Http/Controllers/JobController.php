@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Job;
+use App\Models\JobApplication;
+use App\Models\JobSeekers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class JobController extends Controller
 {
@@ -163,5 +166,60 @@ class JobController extends Controller
         $job->delete();
 
         return redirect()->route('jobs.index')->with('success', 'Job deleted successfully!');
+    }
+
+    // Apply job (job_seeker)
+    public function apply(Request $request, $jobId)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'job_seeker') {
+            return back()->with('error', 'Only job seekers can apply.');
+        }
+        $jobSeeker = $user->jobSeeker;
+        if (!$jobSeeker) {
+            return back()->with('error', 'Please complete your job seeker profile first.');
+        }
+        $job = Job::findOrFail($jobId);
+        // Cek sudah apply
+        if (JobApplication::where('job_id', $job->id)->where('job_seeker_id', $jobSeeker->id)->exists()) {
+            return back()->with('error', 'You have already applied for this job.');
+        }
+        $request->validate([
+            'resume' => 'required|file|mimes:pdf,doc,docx|max:1024',
+        ]);
+        $resumePath = $request->file('resume')->store('resumes', 'public');
+        JobApplication::create([
+            'job_id' => $job->id,
+            'job_seeker_id' => $jobSeeker->id,
+            'resume' => $resumePath,
+        ]);
+        return back()->with('success', 'Application submitted successfully!');
+    }
+
+    // Employer: list pelamar untuk job tertentu
+    public function applicants($jobId)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'employer' || !$user->employer) {
+            return redirect()->route('jobs.index')->with('error', 'Unauthorized.');
+        }
+        $job = Job::with('applications.jobSeeker.user')->where('employer_id', $user->employer->id)->findOrFail($jobId);
+        $applications = $job->applications;
+        return view('jobs.applicants', compact('job', 'applications'));
+    }
+
+    // Employer: detail pelamar
+    public function applicantDetail($applicationId)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'employer' || !$user->employer) {
+            return redirect()->route('jobs.index')->with('error', 'Unauthorized.');
+        }
+        $application = JobApplication::with('job', 'jobSeeker.user')->findOrFail($applicationId);
+        // Cek apakah job ini milik employer
+        if ($application->job->employer_id !== $user->employer->id) {
+            return redirect()->route('jobs.index')->with('error', 'Unauthorized.');
+        }
+        return view('jobs.applicant_detail', compact('application'));
     }
 }

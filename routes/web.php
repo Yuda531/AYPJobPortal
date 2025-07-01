@@ -59,6 +59,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/jobs/{job}/edit', [App\Http\Controllers\JobController::class, 'edit'])->name('jobs.edit');
     Route::put('/jobs/{job}', [App\Http\Controllers\JobController::class, 'update'])->name('jobs.update');
     Route::delete('/jobs/{job}', [App\Http\Controllers\JobController::class, 'destroy'])->name('jobs.destroy');
+    Route::post('/jobs/{job}/apply', [App\Http\Controllers\JobController::class, 'apply'])->name('jobs.apply');
+    Route::get('/employer/jobs/{job}/applications', [App\Http\Controllers\JobController::class, 'applicants'])->name('jobs.applicants');
+    Route::get('/employer/applications/{application}', [App\Http\Controllers\JobController::class, 'applicantDetail'])->name('jobs.applicant_detail');
 
     Route::get('/network', [App\Http\Controllers\NetworkController::class, 'index'])->name('network.index');
 });

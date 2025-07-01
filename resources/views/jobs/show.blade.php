@@ -8,8 +8,8 @@
     <div class="container py-4">
         <div class="row pt-3">
             <!-- Main Content -->
-            <div class="col-md-8">
-                <div class="card mb-4">
+            <div class="col-md-8 ">
+                <div class="card mb-4 p-3">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-4">
                             <div>
@@ -61,10 +61,41 @@
 
                         <div class="d-grid gap-2">
                             @if (Auth::user()->role !== 'employer')
-                                <button class="btn btn-primary">Apply Now</button>
+                                @php
+                                    $hasApplied = false;
+                                    if (Auth::user()->role === 'job_seeker' && Auth::user()->jobSeeker) {
+                                        $hasApplied = \App\Models\JobApplication::where('job_id', $job->id)
+                                            ->where('job_seeker_id', Auth::user()->jobSeeker->id)
+                                            ->exists();
+                                    }
+                                @endphp
+                                @if (Auth::user()->role === 'job_seeker')
+                                    @if ($hasApplied)
+                                        <div class="alert alert-info">You have already applied for this job.</div>
+                                    @else
+                                        <form action="{{ route('jobs.apply', $job->id) }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="mb-3">
+                                                <label class="form-label">Your Resume (PDF/DOC/DOCX, max 1MB)</label>
+                                                <input type="file" name="resume" class="form-control" required
+                                                    accept=".pdf,.doc,.docx">
+                                                @error('resume')
+                                                    <div class="text-danger small">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <button type="submit" class="btn btn-primary w-100">Apply Now</button>
+                                        </form>
+                                    @endif
+                                @else
+                                    <button class="btn btn-primary" disabled>Only job seekers can apply</button>
+                                @endif
                             @endif
 
                             @if (Auth::user()->role === 'employer' && Auth::user()->employer->id === $job->employer_id)
+                                <a href="{{ route('jobs.applicants', $job->id) }}" class="btn btn-info w-100 mb-2">
+                                    <i class="fas fa-users"></i> View Applicants
+                                </a>
                                 <a href="{{ route('jobs.edit', $job->id) }}" class="btn btn-warning">
                                     <i class="fas fa-edit"></i> Edit Job
                                 </a>
