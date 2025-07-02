@@ -19,28 +19,37 @@
         <div class="row pt-3">
             <!-- Sidebar -->
             <div class="col-md-3">
-                <div class="card mb-4">
+                <div class="card mb-4 mt-5">
                     <div class="card-body">
                         <h5 class="card-title">Filters</h5>
-                        <form action="#" method="GET">
+                        <form action="{{ route('jobs.index') }}" method="GET">
                             <div class="mb-3">
                                 <label for="job_type" class="form-label">Job Type</label>
                                 <select name="job_type" id="job_type" class="form-select">
                                     <option value="">All Types</option>
-                                    <option value="full-time">Full Time</option>
-                                    <option value="part-time">Part Time</option>
-                                    <option value="internship">Internship</option>
+                                    <option value="full-time" {{ request('job_type') == 'full-time' ? 'selected' : '' }}>
+                                        Full Time</option>
+                                    <option value="part-time" {{ request('job_type') == 'part-time' ? 'selected' : '' }}>
+                                        Part Time</option>
+                                    <option value="internship" {{ request('job_type') == 'internship' ? 'selected' : '' }}>
+                                        Internship</option>
                                 </select>
                             </div>
                             <div class="mb-3">
                                 <label for="experience_level" class="form-label">Experience Level</label>
                                 <select name="experience_level" id="experience_level" class="form-select">
                                     <option value="">All Levels</option>
-                                    <option value="no_experience">No Experience</option>
-                                    <option value="entry">Entry Level</option>
-                                    <option value="mid">Mid Level</option>
-                                    <option value="senior">Senior Level</option>
-                                    <option value="expert">Expert Level</option>
+                                    <option value="no_experience"
+                                        {{ request('experience_level') == 'no_experience' ? 'selected' : '' }}>No Experience
+                                    </option>
+                                    <option value="entry" {{ request('experience_level') == 'entry' ? 'selected' : '' }}>
+                                        Entry Level</option>
+                                    <option value="mid" {{ request('experience_level') == 'mid' ? 'selected' : '' }}>Mid
+                                        Level</option>
+                                    <option value="senior" {{ request('experience_level') == 'senior' ? 'selected' : '' }}>
+                                        Senior Level</option>
+                                    <option value="expert" {{ request('experience_level') == 'expert' ? 'selected' : '' }}>
+                                        Expert Level</option>
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
@@ -51,7 +60,7 @@
 
             <!-- Main Content -->
             <div class="col-md-9">
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
                     <h2>Job Listings</h2>
                     @if ($isEmployer)
                         <a href="{{ route('jobs.create') }}" class="btn btn-primary">

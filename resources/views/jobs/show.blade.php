@@ -1,11 +1,25 @@
 @php
     use App\Models\Job;
 @endphp
-
 @extends('layouts.app2')
 
 @section('content')
     <div class="container py-4">
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="row pt-3">
             <!-- Main Content -->
             <div class="col-md-8 ">

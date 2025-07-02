@@ -8,6 +8,8 @@ use App\Models\JobSeekers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\JobApplicantsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class JobController extends Controller
 {
@@ -16,9 +18,16 @@ class JobController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $jobs = Job::with('employer')->latest()->get();
+        $query = Job::with('employer')->latest();
+        if ($request->filled('job_type')) {
+            $query->where('job_type', $request->job_type);
+        }
+        if ($request->filled('experience_level')) {
+            $query->where('experience_level', $request->experience_level);
+        }
+        $jobs = $query->get();
         $isEmployer = Auth::user()->role === 'employer';
         return view('jobs.index', compact('jobs', 'isEmployer'));
     }
@@ -221,5 +230,19 @@ class JobController extends Controller
             return redirect()->route('jobs.index')->with('error', 'Unauthorized.');
         }
         return view('jobs.applicant_detail', compact('application'));
+    }
+
+    // Export applicants to Excel
+    public function exportApplicantsExcel($jobId)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'employer' || !$user->employer) {
+            return redirect()->route('jobs.index')->with('error', 'Unauthorized.');
+        }
+        $job = Job::with('applications.jobSeeker.user')->where('employer_id', $user->employer->id)->findOrFail($jobId);
+        $applications = $job->applications;
+        $export = new JobApplicantsExport($job, $applications);
+        $fileName = 'Applicants_for_' . str_replace(' ', '_', $job->title) . '.xlsx';
+        return Excel::download($export, $fileName);
     }
 }
