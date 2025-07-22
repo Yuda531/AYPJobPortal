@@ -20,7 +20,7 @@ Route::get('/welcome', function () {
 
 Route::get('/', function () {
     return view('home', ["title" => 'Home']);
-});
+})->name('home');
 
 Route::controller(AuthController::class)->group(function () {
     Route::get('register', 'register')->name('register');

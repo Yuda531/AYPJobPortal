@@ -9,17 +9,26 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
+                @php
+                    $onHome = request()->routeIs('home') || request()->is('/');
+                @endphp
                 <li class="nav-item">
-                    <a class="nav-link" href="#jobs"><i class="fas fa-search me-1"></i>Find Jobs</a>
+                    <a class="nav-link" href="{{ $onHome ? '#jobs' : route('home', [], false) . '#jobs' }}"><i
+                            class="fas fa-search me-1"></i>Find Jobs</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#categories"><i class="fas fa-list me-1"></i>Categories</a>
+                    <a class="nav-link"
+                        href="{{ $onHome ? '#categories' : route('home', [], false) . '#categories' }}"><i
+                            class="fas fa-list me-1"></i>Categories</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#companies"><i class="fas fa-building me-1"></i>Companies</a>
+                    <a class="nav-link" href="{{ $onHome ? '#companies' : route('home', [], false) . '#companies' }}"><i
+                            class="fas fa-building me-1"></i>Companies</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#testimonials"><i class="fas fa-comments me-1"></i>Testimonials</a>
+                    <a class="nav-link"
+                        href="{{ $onHome ? '#testimonials' : route('home', [], false) . '#testimonials' }}"><i
+                            class="fas fa-comments me-1"></i>Testimonials</a>
                 </li>
             </ul>
             <div class="d-flex">
