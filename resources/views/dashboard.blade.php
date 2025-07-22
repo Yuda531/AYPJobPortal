@@ -11,63 +11,67 @@
 
         <div class="row">
             <!-- Left Section - Profile Info -->
-            <div class="col-md-3">
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            @if ($user->profile_picture)
-                                <img src="data:image/jpeg;base64,{{ base64_encode($user->profile_picture) }}"
-                                    class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: fill;"
-                                    alt="Profile Picture">
-                            @else
-                                <img src="{{ asset('storage/avatar_default.png') }}" class="rounded-circle mb-2"
-                                    style="width: 100px; height: 100px; object-fit: fill;" alt="Profile Picture">
-                            @endif
-                            <h5 class="mb-1">{{ $user->name }}</h5>
-                            <p class="text-muted small mb-2">
-                                @if ($user->role === 'job_seeker')
-                                    {{ $jobSeeker->title ?? 'No title set' }}
+            <div class="col-md-3 ">
+                <div class="position-sticky" style="top: 100px;">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                @if ($user->profile_picture)
+                                    <img src="data:image/jpeg;base64,{{ base64_encode($user->profile_picture) }}"
+                                        class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: fill;"
+                                        alt="Profile Picture">
                                 @else
-                                    <strong>{{ $employer->title ?? 'No title set' }}</strong> at
-                                    <strong>{{ $employer->company_name ?? 'No company name set' }}</strong>
+                                    <img src="{{ asset('storage/avatar_default.png') }}" class="rounded-circle mb-2"
+                                        style="width: 100px; height: 100px; object-fit: fill;" alt="Profile Picture">
                                 @endif
-                            </p>
-                            <div class="border-top pt-2">
-                                <div class="d-flex justify-content-between small text-muted mb-1">
-                                    <span>Profile Views</span>
-                                    <span>100</span>
-                                </div>
-                                <div class="d-flex justify-content-between small text-muted">
-                                    <span>Post Views</span>
-                                    <span>500</span>
+                                <h5 class="mb-1">{{ $user->name }}</h5>
+                                <p class="text-muted small mb-2">
+                                    @if ($user->role === 'job_seeker')
+                                        {{ $jobSeeker->title ?? 'No title set' }}
+                                    @else
+                                        <strong>{{ $employer->title ?? 'No title set' }}</strong> at
+                                        <strong>{{ $employer->company_name ?? 'No company name set' }}</strong>
+                                    @endif
+                                </p>
+                                <div class="border-top pt-2">
+                                    <div class="d-flex justify-content-between small text-muted mb-1">
+                                        <span>Profile Views</span>
+                                        <span>100</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between small text-muted">
+                                        <span>Post Views</span>
+                                        <span>500</span>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="d-grid">
+                                <a href="{{ route('profile.index') }}" class="btn btn-outline-primary btn-sm">View
+                                    Profile</a>
+                            </div>
                         </div>
-                        <div class="d-grid">
-                            <a href="{{ route('profile.index') }}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Recent Activity</h6>
+                            <ul class="list-unstyled small">
+                                <li class="mb-2">
+                                    <i class="fas fa-briefcase text-primary me-2"></i>
+                                    Applied for Senior Developer position
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-user-plus text-success me-2"></i>
+                                    Connected with Sarah Smith
+                                </li>
+                                <li>
+                                    <i class="fas fa-thumbs-up text-info me-2"></i>
+                                    Liked a post about Web Development
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h6 class="card-title">Recent Activity</h6>
-                        <ul class="list-unstyled small">
-                            <li class="mb-2">
-                                <i class="fas fa-briefcase text-primary me-2"></i>
-                                Applied for Senior Developer position
-                            </li>
-                            <li class="mb-2">
-                                <i class="fas fa-user-plus text-success me-2"></i>
-                                Connected with Sarah Smith
-                            </li>
-                            <li>
-                                <i class="fas fa-thumbs-up text-info me-2"></i>
-                                Liked a post about Web Development
-                            </li>
-                        </ul>
-                    </div>
-                </div>
             </div>
 
             <!-- Middle Section - Feed -->
@@ -165,61 +169,64 @@
             </div>
 
             <!-- Right Section - Suggestions -->
-            <div class="col-md-3">
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h6 class="card-title">People you may know</h6>
-                        @foreach ($suggestedUsers as $suggestedUser)
-                            <div class="d-flex align-items-center mb-3">
-                                @if ($suggestedUser->profile_picture)
-                                    <img src="data:image/jpeg;base64,{{ base64_encode($suggestedUser->profile_picture) }}"
-                                        class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: fill;"
-                                        alt="Profile Picture">
-                                @else
-                                    <img src="{{ asset('storage/avatar_default.png') }}" class="rounded-circle me-2"
-                                        style="width: 40px; height: 40px; object-fit: fill;" alt="Profile Picture">
-                                @endif
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-0">{{ $suggestedUser->name }}</h6>
-                                    <small class="text-muted">
-                                        @if ($suggestedUser->role === 'job_seeker')
-                                            {{ $suggestedUser->jobSeeker->title ?? 'No title set' }}
-                                        @else
-                                            {{ $suggestedUser->employer->company_name ?? 'No company set' }}
-                                        @endif
-                                    </small>
+            <div class="col-md-3 ">
+                <div class="position-sticky" style="top: 100px;">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">People you may know</h6>
+                            @foreach ($suggestedUsers as $suggestedUser)
+                                <div class="d-flex align-items-center mb-3">
+                                    @if ($suggestedUser->profile_picture)
+                                        <img src="data:image/jpeg;base64,{{ base64_encode($suggestedUser->profile_picture) }}"
+                                            class="rounded-circle me-2"
+                                            style="width: 40px; height: 40px; object-fit: fill;" alt="Profile Picture">
+                                    @else
+                                        <img src="{{ asset('storage/avatar_default.png') }}" class="rounded-circle me-2"
+                                            style="width: 40px; height: 40px; object-fit: fill;" alt="Profile Picture">
+                                    @endif
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">{{ $suggestedUser->name }}</h6>
+                                        <small class="text-muted">
+                                            @if ($suggestedUser->role === 'job_seeker')
+                                                {{ $suggestedUser->jobSeeker->title ?? 'No title set' }}
+                                            @else
+                                                {{ $suggestedUser->employer->company_name ?? 'No company set' }}
+                                            @endif
+                                        </small>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm">Connect</button>
                                 </div>
-                                <button class="btn btn-outline-primary btn-sm">Connect</button>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Trending Topics</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        <span class="badge bg-light text-dark">#WebDevelopment</span>
+                                        <small class="text-muted d-block">2,500 posts</small>
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        <span class="badge bg-light text-dark">#Laravel</span>
+                                        <small class="text-muted d-block">1,800 posts</small>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="text-decoration-none">
+                                        <span class="badge bg-light text-dark">#RemoteWork</span>
+                                        <small class="text-muted d-block">3,200 posts</small>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Trending Topics</h6>
-                        <ul class="list-unstyled">
-                            <li class="mb-2">
-                                <a href="#" class="text-decoration-none">
-                                    <span class="badge bg-light text-dark">#WebDevelopment</span>
-                                    <small class="text-muted d-block">2,500 posts</small>
-                                </a>
-                            </li>
-                            <li class="mb-2">
-                                <a href="#" class="text-decoration-none">
-                                    <span class="badge bg-light text-dark">#Laravel</span>
-                                    <small class="text-muted d-block">1,800 posts</small>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-decoration-none">
-                                    <span class="badge bg-light text-dark">#RemoteWork</span>
-                                    <small class="text-muted d-block">3,200 posts</small>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
